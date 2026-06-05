@@ -10,25 +10,26 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
 
     :root {
-      --bg:         #07070d;
-      --surface:    #0f0f1a;
-      --surface2:   #141421;
-      --border:     rgba(255,255,255,0.07);
-      --border-glow: rgba(56,189,248,0.3);
-      --cyan:       #38bdf8;
-      --cyan-dim:   rgba(56,189,248,0.1);
-      --violet:     #a78bfa;
-      --pink:       #f472b6;
-      --text:       #e2e8f0;
-      --text-muted: #64748b;
-      --text-sub:   #94a3b8;
-      --font-head:  'Exo', sans-serif;
-      --font-body:  'Inter', sans-serif;
-      --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+      --bg:          #07070d;
+      --surface:     #0f0f1a;
+      --surface2:    #141421;
+      --border:      rgba(255,255,255,0.07);
+      --border-glow: rgba(56,189,248,0.28);
+      --cyan:        #38bdf8;
+      --cyan-dim:    rgba(56,189,248,0.1);
+      --violet:      #a78bfa;
+      --pink:        #f472b6;
+      --text:        #e2e8f0;
+      --text-muted:  #64748b;
+      --text-sub:    #94a3b8;
+      --font-head:   'Exo', sans-serif;
+      --font-body:   'Inter', sans-serif;
+      --ease:        cubic-bezier(0.22, 1, 0.36, 1);
     }
+
+    html, body { height: 100%; }
 
     body {
       background: var(--bg);
@@ -37,19 +38,37 @@
       font-weight: 300;
       font-size: 17px;
       line-height: 1.8;
-      overflow-x: hidden;
+      overflow: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Header ── */
-    .site-header {
-      text-align: center;
-      padding: 6rem 2rem 5rem;
+    /* ── Scroll container ── */
+    #scroll-container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* scrollbar hidden but scrollable */
+    #scroll-container::-webkit-scrollbar { display: none; }
+    #scroll-container { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ── Section base ── */
+    .slide {
+      height: 100vh;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       position: relative;
       overflow: hidden;
     }
 
-    .site-header::before {
+    /* ── Animated grid bg (used on hero) ── */
+    .grid-bg::before {
       content: '';
       position: absolute;
       inset: 0;
@@ -57,8 +76,8 @@
         linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px);
       background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 80% 100% at 50% 0%, black 30%, transparent 100%);
       animation: gridShift 20s linear infinite;
+      pointer-events: none;
     }
 
     @keyframes gridShift {
@@ -66,18 +85,54 @@
       100% { transform: translateY(60px); }
     }
 
-    .site-header-glow {
+    /* ── Glow blob ── */
+    .glow-blob {
       position: absolute;
-      top: 0; left: 50%; transform: translateX(-50%);
-      width: 600px; height: 300px;
-      background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.1) 0%, transparent 70%);
+      border-radius: 50%;
       pointer-events: none;
+      filter: blur(80px);
+      opacity: 0.18;
     }
 
-    .site-header h1 {
+    /* ── Slide indicators (dots on right) ── */
+    #dots {
+      position: fixed;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      z-index: 200;
+    }
+
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+      border: none;
+      padding: 0;
+    }
+
+    .dot.active {
+      background: var(--cyan);
+      transform: scale(1.5);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    /* ── HERO slide ── */
+    .hero-content {
       position: relative;
+      text-align: center;
+      padding: 2rem;
+      z-index: 1;
+    }
+
+    .hero-content h1 {
       font-family: var(--font-head);
-      font-size: clamp(2rem, 5.5vw, 4rem);
+      font-size: clamp(2.2rem, 5.5vw, 4.5rem);
       font-weight: 800;
       line-height: 1.1;
       letter-spacing: -0.02em;
@@ -86,101 +141,61 @@
       margin: 0 auto 1rem;
     }
 
-    .site-header h2 {
-      position: relative;
+    .hero-content h2 {
       font-family: var(--font-head);
-      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-size: clamp(1rem, 2.2vw, 1.35rem);
       font-weight: 300;
       font-style: italic;
       background: linear-gradient(135deg, var(--cyan) 0%, var(--violet) 60%, var(--pink) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      margin-bottom: 3rem;
     }
 
-    /* ── Timeline ── */
-    .timeline {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 0;
-      padding: 3rem 2rem 2rem;
-      max-width: 1000px;
-      margin: 0 auto;
-      overflow-x: auto;
-    }
-
-    .tl-item {
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.5rem;
-      min-width: 90px;
-      opacity: 0;
-      transform: translateY(16px);
-      transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
-    }
-
-    .tl-item.visible { opacity: 1; transform: translateY(0); }
-
-    .tl-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      background: var(--surface2);
-      border: 1px solid var(--border-glow);
-    }
-
-    .tl-dot.active {
-      background: var(--cyan);
-      box-shadow: 0 0 12px var(--cyan);
-    }
-
-    .tl-year {
-      font-family: var(--font-head);
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--cyan);
-    }
-
-    .tl-label {
-      font-size: 0.6rem;
+      gap: 0.4rem;
       color: var(--text-muted);
-      text-align: center;
-      letter-spacing: 0.04em;
-      max-width: 80px;
+      font-family: var(--font-head);
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      animation: bob 2.5s ease-in-out infinite;
     }
 
-    .tl-line {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, rgba(56,189,248,0.3), rgba(56,189,248,0.1));
-      min-width: 20px;
-      margin-top: 4px;
+    .scroll-hint-line {
+      width: 1px;
+      height: 32px;
+      background: linear-gradient(180deg, var(--cyan), transparent);
     }
 
-    /* ── Chapters ── */
-    .chapters {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 0 2rem 6rem;
+    @keyframes bob {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(7px); }
     }
 
-    .chapter {
+    /* ── CHAPTER slides ── */
+    .ch-slide-inner {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 5rem;
       align-items: center;
-      padding: 5rem 0;
-      border-bottom: 1px solid var(--border);
-      opacity: 0;
-      transform: translateY(36px);
-      transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+      max-width: 1140px;
+      width: 100%;
+      padding: 0 3rem;
+      position: relative;
+      z-index: 1;
     }
 
-    .chapter.visible { opacity: 1; transform: translateY(0); }
-    .chapter:last-child { border-bottom: none; }
-    .chapter.flip { direction: rtl; }
-    .chapter.flip > * { direction: ltr; }
+    .ch-slide-inner.flip { direction: rtl; }
+    .ch-slide-inner.flip > * { direction: ltr; }
 
     .ch-num {
       font-family: var(--font-head);
@@ -205,7 +220,7 @@
 
     .ch-text h2 {
       font-family: var(--font-head);
-      font-size: clamp(1.5rem, 2.8vw, 2rem);
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
       font-weight: 700;
       line-height: 1.2;
       color: #fff;
@@ -215,23 +230,19 @@
 
     .ch-text p {
       color: var(--text-sub);
-      font-size: 1.02rem;
+      font-size: 1rem;
       line-height: 1.85;
     }
 
-    .ch-text p + p { margin-top: 0.9rem; }
-
-    .ch-text p strong {
-      color: var(--text);
-      font-weight: 500;
-    }
+    .ch-text p + p { margin-top: 0.85rem; }
+    .ch-text p strong { color: var(--text); font-weight: 500; }
 
     .stat-callout {
       display: inline-flex;
       align-items: baseline;
       gap: 0.5rem;
-      padding: 0.55rem 1rem;
-      margin: 1.1rem 0;
+      padding: 0.5rem 1rem;
+      margin: 1rem 0;
       background: var(--cyan-dim);
       border: 1px solid rgba(56,189,248,0.18);
       border-radius: 8px;
@@ -239,7 +250,7 @@
     }
 
     .stat-callout .num {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 800;
       background: linear-gradient(135deg, var(--cyan), var(--violet));
       -webkit-background-clip: text;
@@ -248,9 +259,8 @@
     }
 
     .stat-callout .desc {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-sub);
-      font-weight: 400;
       font-family: var(--font-body);
     }
 
@@ -266,7 +276,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
+      gap: 0.85rem;
       transition: border-color 0.3s, box-shadow 0.3s;
     }
 
@@ -298,14 +308,16 @@
       justify-content: center;
       background: var(--cyan-dim);
       color: var(--cyan);
+      position: relative; z-index: 1;
     }
 
     .ch-img-label {
       font-family: var(--font-head);
-      font-size: 0.65rem;
+      font-size: 0.63rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--text-muted);
+      position: relative; z-index: 1;
     }
 
     .scan-line {
@@ -323,20 +335,83 @@
       100% { top: 140%; }
     }
 
-    /* ── Closing ── */
-    .closing {
-      text-align: center;
-      padding: 7rem 2rem;
+    /* ── TIMELINE slide ── */
+    .tl-slide-inner {
       position: relative;
-      overflow: hidden;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+      width: 100%;
     }
 
-    .closing::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(56,189,248,0.05) 0%, transparent 70%);
-      pointer-events: none;
+    .tl-slide-inner h3 {
+      font-family: var(--font-head);
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 3rem;
+    }
+
+    .timeline {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .tl-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 110px;
+    }
+
+    .tl-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid rgba(56,189,248,0.3);
+    }
+
+    .tl-dot.active {
+      background: var(--cyan);
+      box-shadow: 0 0 14px var(--cyan);
+    }
+
+    .tl-year {
+      font-family: var(--font-head);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .tl-label {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 0.04em;
+      max-width: 90px;
+    }
+
+    .tl-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(56,189,248,0.3), rgba(56,189,248,0.1));
+      min-width: 20px;
+      margin-top: 5px;
+    }
+
+    /* ── CLOSING slide ── */
+    .closing-inner {
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
     }
 
     .closing-label {
@@ -345,23 +420,22 @@
       letter-spacing: 0.25em;
       text-transform: uppercase;
       color: var(--cyan);
-      margin-bottom: 2rem;
       display: block;
+      margin-bottom: 2rem;
     }
 
-    .closing blockquote {
+    .closing-inner blockquote {
       font-family: var(--font-head);
-      font-size: clamp(1.4rem, 3.5vw, 2.6rem);
+      font-size: clamp(1.4rem, 3.2vw, 2.5rem);
       font-weight: 700;
       font-style: italic;
       color: #fff;
-      max-width: 820px;
-      margin: 0 auto 1.5rem;
       line-height: 1.35;
       letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
     }
 
-    .closing blockquote span {
+    .closing-inner blockquote span {
       background: linear-gradient(135deg, var(--cyan), var(--violet));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -371,8 +445,6 @@
     .closing-sub {
       font-size: 0.95rem;
       color: var(--text-muted);
-      max-width: 50ch;
-      margin: 0 auto;
     }
 
     .closing-rule {
@@ -380,16 +452,14 @@
       align-items: center;
       gap: 1rem;
       justify-content: center;
-      margin-top: 3rem;
+      margin-top: 2.5rem;
     }
 
     .closing-rule-line {
       width: 70px; height: 1px;
       background: linear-gradient(90deg, transparent, var(--cyan));
     }
-    .closing-rule-line.r {
-      background: linear-gradient(90deg, var(--cyan), transparent);
-    }
+    .closing-rule-line.r { background: linear-gradient(90deg, var(--cyan), transparent); }
     .closing-rule-dot {
       width: 5px; height: 5px;
       border-radius: 50%;
@@ -397,205 +467,272 @@
       box-shadow: 0 0 8px var(--cyan);
     }
 
-    /* ── Responsive ── */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation: none !important; transition: none !important; }
-      .chapter, .tl-item { opacity: 1 !important; transform: none !important; }
+    /* ── Slide-in animation ── */
+    .slide-content {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
     }
 
+    .slide.active .slide-content {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .slide-content { opacity: 1 !important; transform: none !important; }
+    }
+
+    /* ── Mobile ── */
     @media (max-width: 768px) {
-      .chapter, .chapter.flip {
+      .ch-slide-inner, .ch-slide-inner.flip {
         grid-template-columns: 1fr;
         direction: ltr;
-        gap: 2.5rem;
-        padding: 3.5rem 0;
+        gap: 2rem;
+        padding: 0 1.5rem;
+        overflow-y: auto;
+        align-content: center;
       }
+
       .ch-img { aspect-ratio: 16/9; }
-      .timeline { justify-content: flex-start; }
+
+      .timeline { flex-wrap: wrap; justify-content: center; gap: 1.5rem; }
+      .tl-line { display: none; }
+
+      #dots { display: none; }
     }
   </style>
 </head>
 <body>
 
-<!-- Header -->
-<header class="site-header">
-  <div class="site-header-glow" aria-hidden="true"></div>
-  <h1>The best invention mankind has ever made</h1>
-  <h2>The Greatest Advancement</h2>
-</header>
+<!-- Dot navigation -->
+<nav id="dots" aria-label="Section navigation"></nav>
 
-<!-- Timeline -->
-<div class="timeline" aria-label="AI timeline">
-  <div class="tl-item">
-    <div class="tl-dot active"></div>
-    <span class="tl-year">1956</span>
-    <span class="tl-label">AI term coined</span>
-  </div>
-  <div class="tl-line"></div>
-  <div class="tl-item">
-    <div class="tl-dot"></div>
-    <span class="tl-year">2010s</span>
-    <span class="tl-label">Machine Learning</span>
-  </div>
-  <div class="tl-line"></div>
-  <div class="tl-item">
-    <div class="tl-dot"></div>
-    <span class="tl-year">2022</span>
-    <span class="tl-label">ChatGPT launch</span>
-  </div>
-  <div class="tl-line"></div>
-  <div class="tl-item">
-    <div class="tl-dot"></div>
-    <span class="tl-year">2023</span>
-    <span class="tl-label">Agentic AI rises</span>
-  </div>
-  <div class="tl-line"></div>
-  <div class="tl-item">
-    <div class="tl-dot active"></div>
-    <span class="tl-year">2026</span>
-    <span class="tl-label">AI everywhere</span>
-  </div>
-  <div class="tl-line"></div>
-  <div class="tl-item">
-    <div class="tl-dot"></div>
-    <span class="tl-year">2035</span>
-    <span class="tl-label">$140B sector</span>
-  </div>
-</div>
+<!-- Scroll container -->
+<div id="scroll-container">
 
-<!-- Chapters -->
-<main class="chapters">
+  <!-- Slide 0: Hero -->
+  <section class="slide grid-bg" data-label="Intro">
+    <div class="glow-blob" style="width:600px;height:400px;top:-100px;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
+    <div class="hero-content slide-content">
+      <h1>The best invention mankind has ever made</h1>
+      <h2>The Greatest Advancement</h2>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">
+      <span>Scroll</span>
+      <div class="scroll-hint-line"></div>
+    </div>
+  </section>
 
-  <article class="chapter" id="spark">
-    <div class="ch-text">
-      <p class="ch-num">01 &mdash; The Spark</p>
-      <h2>Faster Than the Industrial Revolution</h2>
-      <p>
-        Some people think of the <strong>Industrial Revolution</strong> as the most rapid technological advancement in history — attributing the lightbulb, automobiles, and railways to that era's genius. But what if the growth of AI in just the last <strong>four years</strong> was more impactful than the entirety of that revolution?
-      </p>
-      <div class="stat-callout">
-        <span class="num">4 yrs</span>
-        <span class="desc">of AI growth that may outpace a century of industrial progress</span>
+  <!-- Slide 1: Timeline -->
+  <section class="slide" data-label="Timeline">
+    <div class="glow-blob" style="width:500px;height:300px;bottom:0;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
+    <div class="tl-slide-inner slide-content">
+      <h3>The AI timeline</h3>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot active"></div>
+          <span class="tl-year">1956</span>
+          <span class="tl-label">AI term coined</span>
+        </div>
+        <div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <span class="tl-year">2010s</span>
+          <span class="tl-label">Machine Learning</span>
+        </div>
+        <div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <span class="tl-year">2022</span>
+          <span class="tl-label">ChatGPT launch</span>
+        </div>
+        <div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <span class="tl-year">2023</span>
+          <span class="tl-label">Agentic AI rises</span>
+        </div>
+        <div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot active"></div>
+          <span class="tl-year">2026</span>
+          <span class="tl-label">AI everywhere</span>
+        </div>
+        <div class="tl-line"></div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <span class="tl-year">2035</span>
+          <span class="tl-label">$140B sector</span>
+        </div>
       </div>
     </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder">
-      <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-      </div>
-      <span class="ch-img-label">Add image here</span>
-    </div>
-  </article>
+  </section>
 
-  <article class="chapter flip" id="shift">
-    <div class="ch-text">
-      <p class="ch-num">02 &mdash; The Shift</p>
-      <h2>Code Is No Longer Written by Humans</h2>
-      <p>
-        My dad has been a software engineer for over 20 years. Whenever I glanced at his screen, I'd see thousands of lines of code. Last week at his office — <strong>not a single line of code.</strong> Just a Claude Code chat.
-      </p>
-      <p>
-        AI has completely overturned software and the internet. Five years ago, fewer than 5% of web content was AI-generated. Now in 2026, <strong>over 50% is.</strong> Half of everything you see online didn't come from a human.
-      </p>
-    </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder">
-      <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+  <!-- Slide 2: The Spark -->
+  <section class="slide" data-label="The Spark">
+    <div class="glow-blob" style="width:400px;height:400px;top:50%;right:-100px;transform:translateY(-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
+    <div class="ch-slide-inner slide-content">
+      <div class="ch-text">
+        <p class="ch-num">01 &mdash; The Spark</p>
+        <h2>Faster Than the Industrial Revolution</h2>
+        <p>Some people think of the <strong>Industrial Revolution</strong> as the most rapid technological advancement in history — attributing the lightbulb, automobiles, and railways to that era's genius. But what if the growth of AI in just the last <strong>four years</strong> was more impactful than the entirety of that revolution?</p>
+        <div class="stat-callout">
+          <span class="num">4 yrs</span>
+          <span class="desc">of AI growth that may outpace a century of industrial progress</span>
+        </div>
       </div>
-      <span class="ch-img-label">Add image here</span>
-    </div>
-  </article>
-
-  <article class="chapter" id="origin">
-    <div class="ch-text">
-      <p class="ch-num">03 &mdash; The Origin</p>
-      <h2>From 1956 to Agentic AI</h2>
-      <p>
-        AI was first conceived in <strong>1956 by John McCarthy</strong>, who coined the term "Artificial Intelligence" and imagined a machine that could reason and act on its own. It evolved from rule-based logic to machine learning to the agentic systems we have today.
-      </p>
-      <p>
-        The pace accelerated so fast that <strong>AutoGPT gained over 100,000 GitHub stars in a single day</strong> — one of the fastest-growing open-source projects ever.
-      </p>
-    </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder">
-      <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div class="ch-img" role="img" aria-label="Image placeholder">
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="ch-img-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <span class="ch-img-label">Add image here</span>
       </div>
-      <span class="ch-img-label">Add image here</span>
     </div>
-  </article>
+  </section>
 
-  <article class="chapter flip" id="story">
-    <div class="ch-text">
-      <p class="ch-num">04 &mdash; My Story</p>
-      <h2>The Moment Everything Changed</h2>
-      <p>
-        My first encounter with modern AI was in <strong>2023, in 7th grade ELA</strong>. A friend showed me ChatGPT. I asked it to write an essay on the Declaration of Independence — and was floored by the speed and quality.
-      </p>
-      <p>
-        That feeling kept returning: when Claude Code and Codex made coding a single sentence, when Atlas, Cowork, and Openclaw let AI browse the web for you. People started <strong>buying Mac minis as AI-powered mini employees</strong> — paid a fraction of a human salary but 1,000× more capable.
-      </p>
-    </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder">
-      <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  <!-- Slide 3: The Shift -->
+  <section class="slide" data-label="The Shift">
+    <div class="glow-blob" style="width:400px;height:400px;top:50%;left:-100px;transform:translateY(-50%);background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
+    <div class="ch-slide-inner flip slide-content">
+      <div class="ch-text">
+        <p class="ch-num">02 &mdash; The Shift</p>
+        <h2>Code Is No Longer Written by Humans</h2>
+        <p>My dad has been a software engineer for over 20 years. Whenever I glanced at his screen, I'd see thousands of lines of code. Last week at his office — <strong>not a single line of code.</strong> Just a Claude Code chat.</p>
+        <p>AI has overturned software and the internet. Five years ago, fewer than 5% of web content was AI-generated. Now in 2026, <strong>over 50% is.</strong></p>
       </div>
-      <span class="ch-img-label">Add image here</span>
-    </div>
-  </article>
-
-  <article class="chapter" id="future">
-    <div class="ch-text">
-      <p class="ch-num">05 &mdash; The Future</p>
-      <h2>A $140 Billion World Without Human Workers</h2>
-      <p>
-        The agentic AI sector is valued at <strong>$7 billion today</strong>. In nine years it's projected to surpass <strong>$140 billion</strong>. Imagine companies no longer hiring employees — just paying for AI bots that know everything and do it better than any human ever could.
-      </p>
-      <div class="stat-callout">
-        <span class="num">20×</span>
-        <span class="desc">projected growth of the agentic AI sector in under a decade</span>
+      <div class="ch-img" role="img" aria-label="Image placeholder">
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="ch-img-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <span class="ch-img-label">Add image here</span>
       </div>
-      <p>Combined with advanced robotics, AI may eventually make all jobs obsolete.</p>
     </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder">
-      <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+  </section>
+
+  <!-- Slide 4: The Origin -->
+  <section class="slide" data-label="The Origin">
+    <div class="glow-blob" style="width:400px;height:400px;top:50%;right:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#f472b6,transparent)"></div>
+    <div class="ch-slide-inner slide-content">
+      <div class="ch-text">
+        <p class="ch-num">03 &mdash; The Origin</p>
+        <h2>From 1956 to Agentic AI</h2>
+        <p>AI was first conceived in <strong>1956 by John McCarthy</strong>, who coined the term "Artificial Intelligence" and imagined a machine that could reason and act on its own. It evolved from rule-based logic to machine learning to the agentic systems we have today.</p>
+        <p>The pace accelerated so fast that <strong>AutoGPT gained over 100,000 GitHub stars in a single day</strong> — one of the fastest-growing open-source projects ever.</p>
       </div>
-      <span class="ch-img-label">Add image here</span>
+      <div class="ch-img" role="img" aria-label="Image placeholder">
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="ch-img-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <span class="ch-img-label">Add image here</span>
+      </div>
     </div>
-  </article>
+  </section>
 
-</main>
+  <!-- Slide 5: My Story -->
+  <section class="slide" data-label="My Story">
+    <div class="glow-blob" style="width:400px;height:400px;top:50%;left:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
+    <div class="ch-slide-inner flip slide-content">
+      <div class="ch-text">
+        <p class="ch-num">04 &mdash; My Story</p>
+        <h2>The Moment Everything Changed</h2>
+        <p>My first encounter with modern AI was in <strong>2023, in 7th grade ELA</strong>. A friend showed me ChatGPT. I asked it to write an essay on the Declaration of Independence — and was floored by the speed and quality.</p>
+        <p>That feeling kept returning: when Claude Code and Codex made coding a single sentence, when Atlas, Cowork, and Openclaw let AI browse the web for you. People started <strong>buying Mac minis as AI-powered mini employees</strong> — paid a fraction of a human salary but 1,000× more capable.</p>
+      </div>
+      <div class="ch-img" role="img" aria-label="Image placeholder">
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="ch-img-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <span class="ch-img-label">Add image here</span>
+      </div>
+    </div>
+  </section>
 
-<!-- Closing -->
-<footer class="closing">
-  <span class="closing-label">Conclusion</span>
-  <blockquote>
-    "AI is the greatest technological advancement humanity will ever make — greater than the lightbulb, the automobile, the computer, <span>even the wheel.</span>"
-  </blockquote>
-  <p class="closing-sub">
-    Its impact on the future of humanity is incomprehensible, and it might just never stop improving our lives for the rest of human existence.
-  </p>
-  <div class="closing-rule" aria-hidden="true">
-    <div class="closing-rule-line"></div>
-    <div class="closing-rule-dot"></div>
-    <div class="closing-rule-line r"></div>
-  </div>
-</footer>
+  <!-- Slide 6: The Future -->
+  <section class="slide" data-label="The Future">
+    <div class="glow-blob" style="width:400px;height:400px;top:50%;right:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
+    <div class="ch-slide-inner slide-content">
+      <div class="ch-text">
+        <p class="ch-num">05 &mdash; The Future</p>
+        <h2>A $140 Billion World Without Human Workers</h2>
+        <p>The agentic AI sector is valued at <strong>$7 billion today</strong>. In nine years it's projected to surpass <strong>$140 billion</strong>. Imagine companies no longer hiring employees — just paying for AI bots that know everything and do it better than any human ever could.</p>
+        <div class="stat-callout">
+          <span class="num">20×</span>
+          <span class="desc">projected growth of the agentic AI sector in under a decade</span>
+        </div>
+        <p>Combined with advanced robotics, AI may eventually make all jobs obsolete.</p>
+      </div>
+      <div class="ch-img" role="img" aria-label="Image placeholder">
+        <div class="scan-line" aria-hidden="true"></div>
+        <div class="ch-img-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <span class="ch-img-label">Add image here</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7: Closing -->
+  <section class="slide" data-label="Conclusion">
+    <div class="glow-blob" style="width:600px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
+    <div class="closing-inner slide-content">
+      <span class="closing-label">Conclusion</span>
+      <blockquote>
+        "AI is the greatest technological advancement humanity will ever make — greater than the lightbulb, the automobile, the computer, <span>even the wheel.</span>"
+      </blockquote>
+      <p class="closing-sub">Its impact on the future of humanity is incomprehensible, and it might just never stop improving our lives for the rest of human existence.</p>
+      <div class="closing-rule" aria-hidden="true">
+        <div class="closing-rule-line"></div>
+        <div class="closing-rule-dot"></div>
+        <div class="closing-rule-line r"></div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /scroll-container -->
 
 <script>
-  const io = new IntersectionObserver(
-    entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-    { threshold: 0.12 }
-  );
-  document.querySelectorAll('.chapter, .tl-item').forEach((el, i) => {
-    if (el.classList.contains('tl-item')) el.style.transitionDelay = (i * 0.07) + 's';
-    io.observe(el);
+  const container = document.getElementById('scroll-container');
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsNav = document.getElementById('dots');
+
+  // Build dots
+  slides.forEach((slide, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'dot';
+    btn.setAttribute('aria-label', slide.dataset.label || ('Section ' + (i + 1)));
+    btn.addEventListener('click', () => {
+      container.scrollTo({ top: slide.offsetTop, behavior: 'smooth' });
+    });
+    dotsNav.appendChild(btn);
   });
+
+  const dotBtns = Array.from(dotsNav.querySelectorAll('.dot'));
+
+  function setActive(index) {
+    slides.forEach((s, i) => s.classList.toggle('active', i === index));
+    dotBtns.forEach((d, i) => d.classList.toggle('active', i === index));
+  }
+
+  // IntersectionObserver to track which slide is in view
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        setActive(slides.indexOf(entry.target));
+      }
+    });
+  }, { root: container, threshold: 0.6 });
+
+  slides.forEach(s => io.observe(s));
+
+  // Init
+  setActive(0);
 </script>
 
 </body>
