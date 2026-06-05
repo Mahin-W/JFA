@@ -488,6 +488,45 @@
       transform: translateY(0);
     }
 
+    /* ── Works Cited ── */
+    .works-cited-inner {
+      text-align: left;
+      padding: 2rem 3rem;
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      width: 100%;
+    }
+
+    .wc-list {
+      list-style: decimal;
+      padding-left: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .wc-list li {
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      color: var(--text-sub);
+      line-height: 1.7;
+    }
+
+    .wc-list li em { font-style: italic; color: var(--text); }
+
+    .wc-list a {
+      color: var(--cyan);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(56,189,248,0.25);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .wc-list a:hover {
+      color: #fff;
+      border-color: var(--cyan);
+    }
+
     /* ── Reduced motion ── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -681,6 +720,20 @@
         <div class="closing-rule-dot"></div>
         <div class="closing-rule-line r"></div>
       </div>
+    </div>
+  </section>
+
+  <!-- Slide 8: Works Cited -->
+  <section class="slide" data-label="Works Cited">
+    <div class="works-cited-inner slide-content">
+      <span class="closing-label">Works Cited</span>
+      <ol class="wc-list">
+        <li>"History of Artificial Intelligence." <em>Wikipedia</em>, Wikimedia Foundation, <a href="https://en.wikipedia.org/wiki/History_of_artificial_intelligence" target="_blank" rel="noopener">en.wikipedia.org/wiki/History_of_artificial_intelligence</a>.</li>
+        <li>"AutoGPT." <em>Wikipedia</em>, Wikimedia Foundation, <a href="https://en.wikipedia.org/wiki/AutoGPT" target="_blank" rel="noopener">en.wikipedia.org/wiki/AutoGPT</a>.</li>
+        <li>"Artificial Intelligence." <em>Wikiquote</em>, Wikimedia Foundation, <a href="https://en.wikiquote.org/wiki/Artificial_intelligence" target="_blank" rel="noopener">en.wikiquote.org/wiki/Artificial_intelligence</a>.</li>
+        <li>"Agentic AI Market Size, Share &amp; Industry Analysis." <em>Fortune Business Insights</em>, <a href="https://www.fortunebusinessinsights.com/agentic-ai-market-107897" target="_blank" rel="noopener">fortunebusinessinsights.com/agentic-ai-market-107897</a>.</li>
+        <li>"Gartner Predicts Agentic AI Will Autonomously Resolve 80% of Common Customer Service Issues." <em>Gartner</em>, 5 Mar. 2025, <a href="https://www.gartner.com/en/newsroom/press-releases/2025-03-05-gartner-predicts-agentic-ai-will-autonomously-resolve-80-percent-of-common-customer-service-issues" target="_blank" rel="noopener">gartner.com/en/newsroom/press-releases/2025-03-05</a>.</li>
+      </ol>
     </div>
   </section>
 
