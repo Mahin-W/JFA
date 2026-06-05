@@ -3,42 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI: The Greatest Advancement</title>
+  <title>The best invention mankind has ever made</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <style>
-    /* ─── Reset ───────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
-    /* ─── Design Tokens ───────────────────────────────────────── */
     :root {
-      --bg:           #07070d;
-      --surface:      #0f0f1a;
-      --surface2:     #141421;
-      --border:       rgba(255,255,255,0.07);
-      --border-glow:  rgba(96,165,250,0.35);
-
-      --cyan:         #38bdf8;
-      --cyan-dim:     rgba(56,189,248,0.12);
-      --cyan-glow:    0 0 20px rgba(56,189,248,0.3);
-      --violet:       #a78bfa;
-      --violet-dim:   rgba(167,139,250,0.12);
-      --pink:         #f472b6;
-
-      --text:         #e2e8f0;
-      --text-muted:   #64748b;
-      --text-sub:     #94a3b8;
-
-      --font-head:    'Exo', sans-serif;
-      --font-body:    'Inter', sans-serif;
-
-      --ease-out:     cubic-bezier(0.22, 1, 0.36, 1);
+      --bg:         #07070d;
+      --surface:    #0f0f1a;
+      --surface2:   #141421;
+      --border:     rgba(255,255,255,0.07);
+      --border-glow: rgba(56,189,248,0.3);
+      --cyan:       #38bdf8;
+      --cyan-dim:   rgba(56,189,248,0.1);
+      --violet:     #a78bfa;
+      --pink:       #f472b6;
+      --text:       #e2e8f0;
+      --text-muted: #64748b;
+      --text-sub:   #94a3b8;
+      --font-head:  'Exo', sans-serif;
+      --font-body:  'Inter', sans-serif;
+      --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    /* ─── Base ────────────────────────────────────────────────── */
     body {
       background: var(--bg);
       color: var(--text);
@@ -50,59 +41,15 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ─── Nav ─────────────────────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 16px; left: 50%; transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      padding: 0.65rem 2rem;
-      background: rgba(7,7,13,0.8);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      z-index: 100;
-      font-family: var(--font-head);
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .nav-logo {
-      color: var(--cyan);
-      font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-shadow: var(--cyan-glow);
-    }
-
-    .nav-links { display: flex; gap: 1.5rem; }
-
-    .nav-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--cyan); }
-
-    /* ─── Hero ────────────────────────────────────────────────── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+    /* ── Header ── */
+    .site-header {
       text-align: center;
-      padding: 8rem 2rem 6rem;
+      padding: 6rem 2rem 5rem;
       position: relative;
       overflow: hidden;
     }
 
-    /* animated grid background */
-    .hero::before {
+    .site-header::before {
       content: '';
       position: absolute;
       inset: 0;
@@ -110,7 +57,7 @@
         linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px);
       background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+      mask-image: radial-gradient(ellipse 80% 100% at 50% 0%, black 30%, transparent 100%);
       animation: gridShift 20s linear infinite;
     }
 
@@ -119,330 +66,46 @@
       100% { transform: translateY(60px); }
     }
 
-    /* radial glow behind title */
-    .hero-glow {
+    .site-header-glow {
       position: absolute;
-      top: 30%; left: 50%; transform: translate(-50%, -50%);
-      width: 700px; height: 400px;
-      background: radial-gradient(ellipse at center, rgba(96,165,250,0.12) 0%, transparent 70%);
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(56,189,248,0.1) 0%, transparent 70%);
       pointer-events: none;
     }
 
-    .hero-supertitle {
+    .site-header h1 {
       position: relative;
       font-family: var(--font-head);
-      font-size: clamp(0.9rem, 2vw, 1.15rem);
-      font-weight: 300;
-      letter-spacing: 0.04em;
-      color: var(--text-sub);
-      margin-bottom: 1.2rem;
-      font-style: italic;
-    }
-
-    .hero-eyebrow {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.6rem;
-      font-family: var(--font-head);
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--cyan);
-      margin-bottom: 2rem;
-    }
-
-    .hero-eyebrow::before,
-    .hero-eyebrow::after {
-      content: '';
-      display: block;
-      width: 32px; height: 1px;
-      background: var(--cyan);
-      opacity: 0.5;
-    }
-
-    .hero h1 {
-      position: relative;
-      font-family: var(--font-head);
-      font-size: clamp(3rem, 9vw, 7.5rem);
+      font-size: clamp(2rem, 5.5vw, 4rem);
       font-weight: 800;
-      line-height: 1.0;
+      line-height: 1.1;
       letter-spacing: -0.02em;
-      max-width: 14ch;
-      margin: 0 auto 1.5rem;
+      color: #fff;
+      max-width: 18ch;
+      margin: 0 auto 1rem;
     }
 
-    .hero h1 .line-1 { color: #fff; display: block; }
-    .hero h1 .line-2 {
-      display: block;
+    .site-header h2 {
+      position: relative;
+      font-family: var(--font-head);
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      font-weight: 300;
+      font-style: italic;
       background: linear-gradient(135deg, var(--cyan) 0%, var(--violet) 60%, var(--pink) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      filter: drop-shadow(0 0 30px rgba(56,189,248,0.4));
     }
 
-    .hero-sub {
-      position: relative;
-      font-size: 1.05rem;
-      color: var(--text-sub);
-      max-width: 48ch;
-      margin: 0 auto 3.5rem;
-      line-height: 1.7;
-    }
-
-    /* stat strip */
-    .hero-stats {
-      position: relative;
-      display: flex;
-      gap: 3rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 4rem;
-    }
-
-    .hero-stat {
-      text-align: center;
-      padding: 1rem 1.5rem;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--surface);
-      backdrop-filter: blur(10px);
-      min-width: 130px;
-    }
-
-    .hero-stat-num {
-      font-family: var(--font-head);
-      font-size: 1.8rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--cyan), var(--violet));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      display: block;
-      line-height: 1;
-      margin-bottom: 0.3rem;
-    }
-
-    .hero-stat-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .scroll-cue {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 50%; transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-      color: var(--text-muted);
-      font-size: 0.65rem;
-      font-family: var(--font-head);
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      animation: bob 2.5s ease-in-out infinite;
-    }
-
-    .scroll-cue-line {
-      width: 1px;
-      height: 36px;
-      background: linear-gradient(180deg, var(--cyan), transparent);
-    }
-
-    @keyframes bob {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50%       { transform: translateX(-50%) translateY(8px); }
-    }
-
-    /* ─── Chapter sections ────────────────────────────────────── */
-    .chapters { max-width: 1160px; margin: 0 auto; padding: 0 2rem 6rem; }
-
-    .chapter {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5rem;
-      align-items: center;
-      padding: 5.5rem 0;
-      border-bottom: 1px solid var(--border);
-      opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
-    }
-
-    .chapter.visible { opacity: 1; transform: translateY(0); }
-    .chapter:last-child { border-bottom: none; }
-    .chapter.flip { direction: rtl; }
-    .chapter.flip > * { direction: ltr; }
-
-    /* chapter text */
-    .ch-text {}
-
-    .ch-num {
-      font-family: var(--font-head);
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--cyan);
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1.2rem;
-    }
-
-    .ch-num::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, var(--cyan), transparent);
-      opacity: 0.4;
-      max-width: 60px;
-    }
-
-    .ch-text h2 {
-      font-family: var(--font-head);
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
-      font-weight: 700;
-      line-height: 1.2;
-      color: #fff;
-      margin-bottom: 1.2rem;
-      letter-spacing: -0.01em;
-    }
-
-    .ch-text p {
-      color: var(--text-sub);
-      font-size: 1.02rem;
-      line-height: 1.85;
-    }
-
-    .ch-text p strong {
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    /* stat callout */
-    .stat-callout {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 0.5rem;
-      padding: 0.6rem 1rem;
-      margin: 1.2rem 0;
-      background: var(--cyan-dim);
-      border: 1px solid rgba(56,189,248,0.2);
-      border-radius: 8px;
-      font-family: var(--font-head);
-    }
-
-    .stat-callout .num {
-      font-size: 1.6rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--cyan), var(--violet));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .stat-callout .desc {
-      font-size: 0.8rem;
-      color: var(--text-sub);
-      font-weight: 400;
-      font-family: var(--font-body);
-    }
-
-    /* image placeholder */
-    .ch-img {
-      position: relative;
-      aspect-ratio: 4/3;
-      border-radius: 16px;
-      overflow: hidden;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      cursor: pointer;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .ch-img:hover {
-      border-color: rgba(56,189,248,0.4);
-      box-shadow: 0 0 40px rgba(56,189,248,0.08), inset 0 0 40px rgba(56,189,248,0.03);
-    }
-
-    /* animated corner marks */
-    .ch-img::before, .ch-img::after {
-      content: '';
-      position: absolute;
-      width: 18px; height: 18px;
-      border-color: var(--cyan);
-      border-style: solid;
-      opacity: 0.35;
-      transition: opacity 0.3s;
-    }
-    .ch-img::before { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
-    .ch-img::after  { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
-    .ch-img:hover::before, .ch-img:hover::after { opacity: 0.8; }
-
-    .ch-img-inner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .ch-img-icon {
-      width: 44px; height: 44px;
-      border: 1px solid var(--border-glow);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--cyan-dim);
-      color: var(--cyan);
-    }
-
-    .ch-img-label {
-      font-family: var(--font-head);
-      font-size: 0.68rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    /* scanning line animation on hover */
-    .scan-line {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 0%, rgba(56,189,248,0.04) 50%, transparent 100%);
-      height: 40%;
-      top: -40%;
-      animation: scan 3s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    @keyframes scan {
-      0%   { top: -40%; }
-      100% { top: 140%; }
-    }
-
-    /* ─── Timeline divider ────────────────────────────────────── */
+    /* ── Timeline ── */
     .timeline {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
       gap: 0;
-      padding: 3rem 2rem;
-      max-width: 1160px;
+      padding: 3rem 2rem 2rem;
+      max-width: 1000px;
       margin: 0 auto;
       overflow-x: auto;
     }
@@ -454,7 +117,7 @@
       gap: 0.5rem;
       min-width: 90px;
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(16px);
       transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
     }
 
@@ -465,8 +128,6 @@
       border-radius: 50%;
       background: var(--surface2);
       border: 1px solid var(--border-glow);
-      position: relative;
-      z-index: 1;
     }
 
     .tl-dot.active {
@@ -482,10 +143,10 @@
     }
 
     .tl-label {
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       color: var(--text-muted);
       text-align: center;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       max-width: 80px;
     }
 
@@ -493,11 +154,176 @@
       flex: 1;
       height: 1px;
       background: linear-gradient(90deg, rgba(56,189,248,0.3), rgba(56,189,248,0.1));
-      min-width: 24px;
-      margin-top: -22px;
+      min-width: 20px;
+      margin-top: 4px;
     }
 
-    /* ─── Closing ─────────────────────────────────────────────── */
+    /* ── Chapters ── */
+    .chapters {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+    }
+
+    .chapter {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+      padding: 5rem 0;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(36px);
+      transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+    }
+
+    .chapter.visible { opacity: 1; transform: translateY(0); }
+    .chapter:last-child { border-bottom: none; }
+    .chapter.flip { direction: rtl; }
+    .chapter.flip > * { direction: ltr; }
+
+    .ch-num {
+      font-family: var(--font-head);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+
+    .ch-num::after {
+      content: '';
+      display: block;
+      width: 40px; height: 1px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+      opacity: 0.4;
+    }
+
+    .ch-text h2 {
+      font-family: var(--font-head);
+      font-size: clamp(1.5rem, 2.8vw, 2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      color: #fff;
+      margin-bottom: 1.1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .ch-text p {
+      color: var(--text-sub);
+      font-size: 1.02rem;
+      line-height: 1.85;
+    }
+
+    .ch-text p + p { margin-top: 0.9rem; }
+
+    .ch-text p strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .stat-callout {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      padding: 0.55rem 1rem;
+      margin: 1.1rem 0;
+      background: var(--cyan-dim);
+      border: 1px solid rgba(56,189,248,0.18);
+      border-radius: 8px;
+      font-family: var(--font-head);
+    }
+
+    .stat-callout .num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-callout .desc {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      font-weight: 400;
+      font-family: var(--font-body);
+    }
+
+    /* ── Image placeholder ── */
+    .ch-img {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .ch-img:hover {
+      border-color: rgba(56,189,248,0.35);
+      box-shadow: 0 0 40px rgba(56,189,248,0.06);
+    }
+
+    .ch-img::before, .ch-img::after {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      border-color: var(--cyan);
+      border-style: solid;
+      opacity: 0.3;
+      transition: opacity 0.3s;
+    }
+
+    .ch-img::before { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
+    .ch-img::after  { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
+    .ch-img:hover::before, .ch-img:hover::after { opacity: 0.7; }
+
+    .ch-img-icon {
+      width: 42px; height: 42px;
+      border: 1px solid rgba(56,189,248,0.25);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cyan-dim);
+      color: var(--cyan);
+    }
+
+    .ch-img-label {
+      font-family: var(--font-head);
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .scan-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 40%;
+      top: -40%;
+      background: linear-gradient(180deg, transparent 0%, rgba(56,189,248,0.04) 50%, transparent 100%);
+      animation: scan 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scan {
+      0%   { top: -40%; }
+      100% { top: 140%; }
+    }
+
+    /* ── Closing ── */
     .closing {
       text-align: center;
       padding: 7rem 2rem;
@@ -509,7 +335,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(96,165,250,0.06) 0%, transparent 70%);
+      background: radial-gradient(ellipse 60% 70% at 50% 50%, rgba(56,189,248,0.05) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -525,7 +351,7 @@
 
     .closing blockquote {
       font-family: var(--font-head);
-      font-size: clamp(1.5rem, 4vw, 2.8rem);
+      font-size: clamp(1.4rem, 3.5vw, 2.6rem);
       font-weight: 700;
       font-style: italic;
       color: #fff;
@@ -546,10 +372,10 @@
       font-size: 0.95rem;
       color: var(--text-muted);
       max-width: 50ch;
-      margin: 0 auto 3rem;
+      margin: 0 auto;
     }
 
-    .closing-border {
+    .closing-rule {
       display: flex;
       align-items: center;
       gap: 1rem;
@@ -557,106 +383,45 @@
       margin-top: 3rem;
     }
 
-    .closing-border-line {
-      width: 80px; height: 1px;
+    .closing-rule-line {
+      width: 70px; height: 1px;
       background: linear-gradient(90deg, transparent, var(--cyan));
     }
-
-    .closing-border-line.r {
+    .closing-rule-line.r {
       background: linear-gradient(90deg, var(--cyan), transparent);
     }
-
-    .closing-border-dot {
-      width: 6px; height: 6px;
+    .closing-rule-dot {
+      width: 5px; height: 5px;
       border-radius: 50%;
       background: var(--cyan);
-      box-shadow: 0 0 10px var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
     }
 
-    /* ─── Reduced motion ──────────────────────────────────────── */
+    /* ── Responsive ── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
-      .chapter { opacity: 1 !important; transform: none !important; }
-      .tl-item { opacity: 1 !important; transform: none !important; }
+      .chapter, .tl-item { opacity: 1 !important; transform: none !important; }
     }
 
-    /* ─── Mobile ──────────────────────────────────────────────── */
     @media (max-width: 768px) {
-      nav .nav-links { display: none; }
-
-      .hero h1 { font-size: clamp(2.4rem, 12vw, 4rem); }
-
-      .hero-stats { gap: 1rem; }
-      .hero-stat { min-width: 100px; padding: 0.75rem 1rem; }
-
       .chapter, .chapter.flip {
         grid-template-columns: 1fr;
         direction: ltr;
         gap: 2.5rem;
         padding: 3.5rem 0;
       }
-
       .ch-img { aspect-ratio: 16/9; }
-
       .timeline { justify-content: flex-start; }
-
-      .closing blockquote { font-size: 1.4rem; }
     }
   </style>
 </head>
 <body>
 
-<!-- Nav -->
-<nav aria-label="Site navigation">
-  <span class="nav-logo">AI &amp; The Future</span>
-  <div class="nav-links">
-    <a href="#origin">Origin</a>
-    <a href="#shift">The Shift</a>
-    <a href="#story">My Story</a>
-    <a href="#future">Future</a>
-  </div>
-</nav>
-
-<!-- Hero -->
-<header class="hero">
-  <div class="hero-glow" aria-hidden="true"></div>
-
-  <p class="hero-eyebrow">Student Essay &mdash; 2026</p>
-
-  <p class="hero-supertitle">The best invention mankind has ever made</p>
-
-  <h1>
-    <span class="line-1">The Greatest</span>
-    <span class="line-2">Advancement</span>
-  </h1>
-
-  <p class="hero-sub">
-    How artificial intelligence in four years outpaced every technological leap humanity has ever made — and why it will never stop.
-  </p>
-
-  <div class="hero-stats" aria-label="Key statistics">
-    <div class="hero-stat">
-      <span class="hero-stat-num">50%</span>
-      <span class="hero-stat-label">of internet is AI-generated</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-num">$7B</span>
-      <span class="hero-stat-label">Agentic AI value today</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-num">$140B</span>
-      <span class="hero-stat-label">Projected in 9 years</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-num">1956</span>
-      <span class="hero-stat-label">When it all began</span>
-    </div>
-  </div>
-
-  <div class="scroll-cue" aria-hidden="true">
-    <span>Scroll</span>
-    <div class="scroll-cue-line"></div>
-  </div>
+<!-- Header -->
+<header class="site-header">
+  <div class="site-header-glow" aria-hidden="true"></div>
+  <h1>The best invention mankind has ever made</h1>
+  <h2>The Greatest Advancement</h2>
 </header>
 
 <!-- Timeline -->
@@ -664,19 +429,19 @@
   <div class="tl-item">
     <div class="tl-dot active"></div>
     <span class="tl-year">1956</span>
-    <span class="tl-label">Term "AI" coined</span>
+    <span class="tl-label">AI term coined</span>
   </div>
   <div class="tl-line"></div>
   <div class="tl-item">
     <div class="tl-dot"></div>
     <span class="tl-year">2010s</span>
-    <span class="tl-label">Machine Learning era</span>
+    <span class="tl-label">Machine Learning</span>
   </div>
   <div class="tl-line"></div>
   <div class="tl-item">
     <div class="tl-dot"></div>
     <span class="tl-year">2022</span>
-    <span class="tl-label">ChatGPT launched</span>
+    <span class="tl-label">ChatGPT launch</span>
   </div>
   <div class="tl-line"></div>
   <div class="tl-item">
@@ -701,116 +466,106 @@
 <!-- Chapters -->
 <main class="chapters">
 
-  <!-- Ch 1: The Spark -->
-  <article class="chapter" id="origin">
+  <article class="chapter" id="spark">
     <div class="ch-text">
       <p class="ch-num">01 &mdash; The Spark</p>
       <h2>Faster Than the Industrial Revolution</h2>
       <p>
         Some people think of the <strong>Industrial Revolution</strong> as the most rapid technological advancement in history — attributing the lightbulb, automobiles, and railways to that era's genius. But what if the growth of AI in just the last <strong>four years</strong> was more impactful than the entirety of that revolution?
       </p>
-      <div class="stat-callout" aria-label="Key statistic">
+      <div class="stat-callout">
         <span class="num">4 yrs</span>
         <span class="desc">of AI growth that may outpace a century of industrial progress</span>
       </div>
     </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder — add your image here">
+    <div class="ch-img" role="img" aria-label="Image placeholder">
       <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-inner">
-        <div class="ch-img-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-        </div>
-        <span class="ch-img-label">Add image here</span>
+      <div class="ch-img-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
       </div>
+      <span class="ch-img-label">Add image here</span>
     </div>
   </article>
 
-  <!-- Ch 2: The Shift -->
   <article class="chapter flip" id="shift">
     <div class="ch-text">
       <p class="ch-num">02 &mdash; The Shift</p>
       <h2>Code Is No Longer Written by Humans</h2>
       <p>
-        My dad has been a software engineer for over 20 years. Whenever I glanced at his screen, I'd see thousands of lines of code. Last week at his office — <strong>not a single line of code.</strong> Just a Claude Code chat. AI has completely overturned software and the internet. Five years ago, fewer than 5% of web content was AI-generated.
+        My dad has been a software engineer for over 20 years. Whenever I glanced at his screen, I'd see thousands of lines of code. Last week at his office — <strong>not a single line of code.</strong> Just a Claude Code chat.
       </p>
-      <div class="stat-callout">
-        <span class="num">50%</span>
-        <span class="desc">of the internet is now AI-generated content</span>
-      </div>
-      <p>Imagine — half of everything you see online didn't come from a human. That's insane.</p>
+      <p>
+        AI has completely overturned software and the internet. Five years ago, fewer than 5% of web content was AI-generated. Now in 2026, <strong>over 50% is.</strong> Half of everything you see online didn't come from a human.
+      </p>
     </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder — add your image here">
+    <div class="ch-img" role="img" aria-label="Image placeholder">
       <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-inner">
-        <div class="ch-img-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        </div>
-        <span class="ch-img-label">Add image here</span>
+      <div class="ch-img-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
       </div>
+      <span class="ch-img-label">Add image here</span>
     </div>
   </article>
 
-  <!-- Ch 3: Origin -->
-  <article class="chapter">
+  <article class="chapter" id="origin">
     <div class="ch-text">
       <p class="ch-num">03 &mdash; The Origin</p>
       <h2>From 1956 to Agentic AI</h2>
       <p>
-        AI was first conceived in <strong>1956 by John McCarthy</strong>, who coined the term "Artificial Intelligence" and imagined a machine that could reason and act on its own. Over decades it evolved: rule-based logic → machine learning → the agentic AI systems we have today. The pace accelerated so fast that <strong>AutoGPT gained over 100,000 GitHub stars in a single day</strong> — one of the fastest-growing open-source projects ever.
+        AI was first conceived in <strong>1956 by John McCarthy</strong>, who coined the term "Artificial Intelligence" and imagined a machine that could reason and act on its own. It evolved from rule-based logic to machine learning to the agentic systems we have today.
+      </p>
+      <p>
+        The pace accelerated so fast that <strong>AutoGPT gained over 100,000 GitHub stars in a single day</strong> — one of the fastest-growing open-source projects ever.
       </p>
     </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder — add your image here">
+    <div class="ch-img" role="img" aria-label="Image placeholder">
       <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-inner">
-        <div class="ch-img-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <span class="ch-img-label">Add image here</span>
+      <div class="ch-img-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </div>
+      <span class="ch-img-label">Add image here</span>
     </div>
   </article>
 
-  <!-- Ch 4: My Story -->
   <article class="chapter flip" id="story">
     <div class="ch-text">
       <p class="ch-num">04 &mdash; My Story</p>
       <h2>The Moment Everything Changed</h2>
       <p>
-        My first encounter with modern AI was in <strong>2023, in 7th grade ELA</strong>. A friend showed me ChatGPT. I asked it to write an essay on the Declaration of Independence — and was floored by the speed and quality. That feeling kept returning: when Claude Code and Codex made coding a single sentence, when Atlas, Cowork, and Openclaw let AI browse the web and do everything for you. People started <strong>buying Mac minis as AI-powered mini employees</strong>, paid a fraction of a human salary but 1,000× more capable.
+        My first encounter with modern AI was in <strong>2023, in 7th grade ELA</strong>. A friend showed me ChatGPT. I asked it to write an essay on the Declaration of Independence — and was floored by the speed and quality.
+      </p>
+      <p>
+        That feeling kept returning: when Claude Code and Codex made coding a single sentence, when Atlas, Cowork, and Openclaw let AI browse the web for you. People started <strong>buying Mac minis as AI-powered mini employees</strong> — paid a fraction of a human salary but 1,000× more capable.
       </p>
     </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder — add your image here">
+    <div class="ch-img" role="img" aria-label="Image placeholder">
       <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-inner">
-        <div class="ch-img-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </div>
-        <span class="ch-img-label">Add image here</span>
+      <div class="ch-img-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       </div>
+      <span class="ch-img-label">Add image here</span>
     </div>
   </article>
 
-  <!-- Ch 5: Future -->
   <article class="chapter" id="future">
     <div class="ch-text">
       <p class="ch-num">05 &mdash; The Future</p>
       <h2>A $140 Billion World Without Human Workers</h2>
       <p>
-        The agentic AI sector is valued at <strong>$7 billion today</strong>. In nine years it's projected to surpass <strong>$140 billion</strong>. Imagine companies no longer hiring employees — just paying for AI bots. Nobody ever has to learn a skill because AI knows everything and does it better than any human ever could. Combined with advanced robotics, AI may eventually <strong>make all jobs obsolete.</strong>
+        The agentic AI sector is valued at <strong>$7 billion today</strong>. In nine years it's projected to surpass <strong>$140 billion</strong>. Imagine companies no longer hiring employees — just paying for AI bots that know everything and do it better than any human ever could.
       </p>
       <div class="stat-callout">
         <span class="num">20×</span>
         <span class="desc">projected growth of the agentic AI sector in under a decade</span>
       </div>
+      <p>Combined with advanced robotics, AI may eventually make all jobs obsolete.</p>
     </div>
-    <div class="ch-img" role="img" aria-label="Image placeholder — add your image here">
+    <div class="ch-img" role="img" aria-label="Image placeholder">
       <div class="scan-line" aria-hidden="true"></div>
-      <div class="ch-img-inner">
-        <div class="ch-img-icon" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        </div>
-        <span class="ch-img-label">Add image here</span>
+      <div class="ch-img-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
       </div>
+      <span class="ch-img-label">Add image here</span>
     </div>
   </article>
 
@@ -825,24 +580,20 @@
   <p class="closing-sub">
     Its impact on the future of humanity is incomprehensible, and it might just never stop improving our lives for the rest of human existence.
   </p>
-  <div class="closing-border" aria-hidden="true">
-    <div class="closing-border-line"></div>
-    <div class="closing-border-dot"></div>
-    <div class="closing-border-line r"></div>
+  <div class="closing-rule" aria-hidden="true">
+    <div class="closing-rule-line"></div>
+    <div class="closing-rule-dot"></div>
+    <div class="closing-rule-line r"></div>
   </div>
 </footer>
 
 <script>
-  // Scroll reveal
   const io = new IntersectionObserver(
     entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
     { threshold: 0.12 }
   );
-
   document.querySelectorAll('.chapter, .tl-item').forEach((el, i) => {
-    if (el.classList.contains('tl-item')) {
-      el.style.transitionDelay = (i * 0.07) + 's';
-    }
+    if (el.classList.contains('tl-item')) el.style.transitionDelay = (i * 0.07) + 's';
     io.observe(el);
   });
 </script>
