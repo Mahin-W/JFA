@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -27,6 +26,7 @@
       --font-head:   'Exo', sans-serif;
       --font-body:   'Inter', sans-serif;
       --ease:        cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-back:   cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     html, body { height: 100%; }
@@ -42,7 +42,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Scroll container ── */
+    /* ─── Scroll container ──────────────────────────────── */
     #scroll-container {
       height: 100vh;
       overflow-y: scroll;
@@ -50,12 +50,10 @@
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
     }
-
-    /* scrollbar hidden but scrollable */
     #scroll-container::-webkit-scrollbar { display: none; }
     #scroll-container { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* ── Section base ── */
+    /* ─── Slide base ────────────────────────────────────── */
     .slide {
       height: 100vh;
       scroll-snap-align: start;
@@ -67,7 +65,7 @@
       overflow: hidden;
     }
 
-    /* ── Animated grid bg (used on hero) ── */
+    /* ─── Animated grid (hero) ──────────────────────────── */
     .grid-bg::before {
       content: '';
       position: absolute;
@@ -79,494 +77,361 @@
       animation: gridShift 20s linear infinite;
       pointer-events: none;
     }
-
     @keyframes gridShift {
-      0%   { transform: translateY(0); }
-      100% { transform: translateY(60px); }
+      from { transform: translateY(0); }
+      to   { transform: translateY(60px); }
     }
 
-    /* ── Glow blob ── */
+    /* ─── Glow blobs ────────────────────────────────────── */
     .glow-blob {
       position: absolute;
       border-radius: 50%;
       pointer-events: none;
       filter: blur(80px);
-      opacity: 0.18;
+      opacity: 0;
+      transition: opacity 1s var(--ease);
+      will-change: transform, opacity;
+    }
+    .slide.active .glow-blob { opacity: 0.2; animation: blobDrift 8s ease-in-out infinite; }
+    @keyframes blobDrift {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%     { transform: translate(20px,-15px) scale(1.06); }
+      66%     { transform: translate(-15px,10px) scale(0.96); }
     }
 
-    /* ── Slide indicators (dots on right) ── */
+    /* ─── Floating particles ────────────────────────────── */
+    .particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: var(--cyan);
+      opacity: 0;
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+      0%   { opacity: 0;    transform: translateY(0) scale(1); }
+      10%  { opacity: 0.5; }
+      90%  { opacity: 0.2; }
+      100% { opacity: 0;    transform: translateY(-100vh) scale(0.5); }
+    }
+
+    /* ─── Dot nav ───────────────────────────────────────── */
     #dots {
       position: fixed;
-      right: 1.5rem;
-      top: 50%;
+      right: 1.5rem; top: 50%;
       transform: translateY(-50%);
       display: flex;
       flex-direction: column;
       gap: 0.55rem;
       z-index: 200;
     }
-
     .dot {
       width: 6px; height: 6px;
       border-radius: 50%;
       background: var(--text-muted);
       cursor: pointer;
       transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
-      border: none;
-      padding: 0;
+      border: none; padding: 0;
     }
-
     .dot.active {
       background: var(--cyan);
-      transform: scale(1.5);
-      box-shadow: 0 0 8px var(--cyan);
+      transform: scale(1.6);
+      box-shadow: 0 0 10px var(--cyan);
     }
 
-    /* ── HERO slide ── */
+    /* ─── Scroll hint ───────────────────────────────────── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+      color: var(--text-muted);
+      font-family: var(--font-head); font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase;
+      animation: bob 2.5s ease-in-out infinite;
+    }
+    .scroll-hint-line { width: 1px; height: 32px; background: linear-gradient(180deg, var(--cyan), transparent); }
+    @keyframes bob {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%     { transform: translateX(-50%) translateY(7px); }
+    }
+
+    /* ─── ANIMATION SYSTEM ──────────────────────────────── */
+
+    /* base hidden states */
+    .a-up    { opacity: 0; transform: translateY(36px);       will-change: opacity, transform; }
+    .a-right { opacity: 0; transform: translateX(80px) scale(0.95); will-change: opacity, transform; }
+    .a-left  { opacity: 0; transform: translateX(-80px) scale(0.95); will-change: opacity, transform; }
+    .a-scale { opacity: 0; transform: scale(0.88);            will-change: opacity, transform; }
+
+    /* transition definitions */
+    .a-up, .a-scale {
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+    .a-right, .a-left {
+      transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+    }
+
+    /* active: animate in */
+    .slide.active .a-up    { opacity: 1; transform: translateY(0); }
+    .slide.active .a-right { opacity: 1; transform: translateX(0) scale(1); }
+    .slide.active .a-left  { opacity: 1; transform: translateX(0) scale(1); }
+    .slide.active .a-scale { opacity: 1; transform: scale(1); }
+
+    /* stagger delays */
+    .d0 { transition-delay: 0s; }
+    .d1 { transition-delay: 0.1s; }
+    .d2 { transition-delay: 0.2s; }
+    .d3 { transition-delay: 0.3s; }
+    .d4 { transition-delay: 0.42s; }
+    .d5 { transition-delay: 0.54s; }
+    .d6 { transition-delay: 0.18s; } /* image delay */
+
+    /* ─── Image shimmer on entry ────────────────────────── */
+    .ch-img .shimmer {
+      position: absolute;
+      inset: 0; z-index: 2;
+      background: linear-gradient(105deg,
+        transparent 30%,
+        rgba(255,255,255,0.12) 50%,
+        transparent 70%
+      );
+      transform: translateX(-100%);
+      pointer-events: none;
+    }
+    .slide.active .ch-img .shimmer {
+      animation: shimmerSweep 0.9s var(--ease) 0.6s forwards;
+    }
+    @keyframes shimmerSweep {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(200%); }
+    }
+
+    /* ─── Image border glow pulse ───────────────────────── */
+    .slide.active .ch-img {
+      animation: imgGlow 3s ease-in-out 1s infinite;
+    }
+    @keyframes imgGlow {
+      0%,100% { box-shadow: 0 0 0 rgba(56,189,248,0); }
+      50%     { box-shadow: 0 0 30px rgba(56,189,248,0.12); }
+    }
+
+    /* ─── HERO ──────────────────────────────────────────── */
     .hero-content {
-      position: relative;
-      text-align: center;
-      padding: 2rem;
-      z-index: 1;
+      position: relative; text-align: center; padding: 2rem; z-index: 1;
     }
-
     .hero-content h1 {
       font-family: var(--font-head);
       font-size: clamp(2.2rem, 5.5vw, 4.5rem);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      color: #fff;
-      max-width: 18ch;
-      margin: 0 auto 1rem;
+      font-weight: 800; line-height: 1.1; letter-spacing: -0.02em;
+      color: #fff; max-width: 18ch; margin: 0 auto 1rem;
     }
-
     .hero-content h2 {
       font-family: var(--font-head);
       font-size: clamp(1rem, 2.2vw, 1.35rem);
-      font-weight: 300;
-      font-style: italic;
+      font-weight: 300; font-style: italic;
       background: linear-gradient(135deg, var(--cyan) 0%, var(--violet) 60%, var(--pink) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 3rem;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
 
-    .scroll-hint {
-      position: absolute;
-      bottom: 2.5rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-      color: var(--text-muted);
-      font-family: var(--font-head);
-      font-size: 0.62rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      animation: bob 2.5s ease-in-out infinite;
-    }
-
-    .scroll-hint-line {
-      width: 1px;
-      height: 32px;
-      background: linear-gradient(180deg, var(--cyan), transparent);
-    }
-
-    @keyframes bob {
-      0%, 100% { transform: translateX(-50%) translateY(0); }
-      50%       { transform: translateX(-50%) translateY(7px); }
-    }
-
-    /* ── CHAPTER slides ── */
+    /* ─── CHAPTER layout ────────────────────────────────── */
     .ch-slide-inner {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 5rem;
-      align-items: center;
-      max-width: 1140px;
-      width: 100%;
-      padding: 0 3rem;
-      position: relative;
-      z-index: 1;
+      gap: 5rem; align-items: center;
+      max-width: 1140px; width: 100%;
+      padding: 0 3rem; position: relative; z-index: 1;
     }
-
     .ch-slide-inner.flip { direction: rtl; }
     .ch-slide-inner.flip > * { direction: ltr; }
 
     .ch-num {
-      font-family: var(--font-head);
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--cyan);
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1rem;
+      font-family: var(--font-head); font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--cyan);
+      display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem;
     }
-
     .ch-num::after {
-      content: '';
-      display: block;
-      width: 40px; height: 1px;
+      content: ''; display: block; width: 0; height: 1px;
       background: linear-gradient(90deg, var(--cyan), transparent);
-      opacity: 0.4;
+      opacity: 0.5;
+      transition: width 0.6s var(--ease) 0.3s;
     }
+    .slide.active .ch-num::after { width: 48px; }
 
     .ch-text h2 {
       font-family: var(--font-head);
       font-size: clamp(1.5rem, 2.5vw, 2rem);
-      font-weight: 700;
-      line-height: 1.2;
-      color: #fff;
-      margin-bottom: 1.1rem;
-      letter-spacing: -0.01em;
+      font-weight: 700; line-height: 1.2; color: #fff;
+      margin-bottom: 1.1rem; letter-spacing: -0.01em;
     }
-
-    .ch-text p {
-      color: var(--text-sub);
-      font-size: 1rem;
-      line-height: 1.85;
-    }
-
+    .ch-text p { color: var(--text-sub); font-size: 1rem; line-height: 1.85; }
     .ch-text p + p { margin-top: 0.85rem; }
     .ch-text p strong { color: var(--text); font-weight: 500; }
 
     .stat-callout {
-      display: inline-flex;
-      align-items: baseline;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      margin: 1rem 0;
+      display: inline-flex; align-items: baseline; gap: 0.5rem;
+      padding: 0.5rem 1rem; margin: 1rem 0;
       background: var(--cyan-dim);
       border: 1px solid rgba(56,189,248,0.18);
-      border-radius: 8px;
-      font-family: var(--font-head);
+      border-radius: 8px; font-family: var(--font-head);
     }
-
     .stat-callout .num {
-      font-size: 1.4rem;
-      font-weight: 800;
+      font-size: 1.4rem; font-weight: 800;
       background: linear-gradient(135deg, var(--cyan), var(--violet));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
+    .stat-callout .desc { font-size: 0.78rem; color: var(--text-sub); font-family: var(--font-body); }
 
-    .stat-callout .desc {
-      font-size: 0.78rem;
-      color: var(--text-sub);
-      font-family: var(--font-body);
-    }
-
-    /* ── Image placeholder ── */
+    /* ─── Image container ───────────────────────────────── */
     .ch-img {
-      position: relative;
-      aspect-ratio: 4/3;
-      border-radius: 16px;
-      overflow: hidden;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.85rem;
-      transition: border-color 0.3s, box-shadow 0.3s;
+      position: relative; aspect-ratio: 4/3;
+      border-radius: 16px; overflow: hidden;
+      background: var(--surface2); border: 1px solid var(--border);
+      transition: border-color 0.3s;
     }
-
-    .ch-img:hover {
-      border-color: rgba(56,189,248,0.35);
-      box-shadow: 0 0 40px rgba(56,189,248,0.06);
+    .ch-img::before, .ch-img::after {
+      content: ''; position: absolute;
+      width: 20px; height: 20px;
+      border-color: var(--cyan); border-style: solid;
+      z-index: 3; transition: width 0.4s var(--ease) 0.7s, height 0.4s var(--ease) 0.7s, opacity 0.4s;
+      opacity: 0;
+      width: 0; height: 0;
     }
+    .ch-img::before { top: 8px; left: 8px; border-width: 1.5px 0 0 1.5px; }
+    .ch-img::after  { bottom: 8px; right: 8px; border-width: 0 1.5px 1.5px 0; }
+    .slide.active .ch-img::before,
+    .slide.active .ch-img::after { width: 20px; height: 20px; opacity: 0.6; }
 
     .ch-img img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 15px;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; border-radius: 15px;
+      transition: transform 6s ease;
     }
+    .slide.active .ch-img img { transform: scale(1.04); }
 
-    .ch-img::before, .ch-img::after {
-      content: '';
-      position: absolute;
-      width: 16px; height: 16px;
-      border-color: var(--cyan);
-      border-style: solid;
-      opacity: 0.3;
-      transition: opacity 0.3s;
-    }
-
-    .ch-img::before { top: 10px; left: 10px; border-width: 1px 0 0 1px; }
-    .ch-img::after  { bottom: 10px; right: 10px; border-width: 0 1px 1px 0; }
-    .ch-img:hover::before, .ch-img:hover::after { opacity: 0.7; }
-
-    .ch-img-icon {
-      width: 42px; height: 42px;
-      border: 1px solid rgba(56,189,248,0.25);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--cyan-dim);
-      color: var(--cyan);
-      position: relative; z-index: 1;
-    }
-
-    .ch-img-label {
-      font-family: var(--font-head);
-      font-size: 0.63rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      position: relative; z-index: 1;
-    }
-
-    .scan-line {
-      position: absolute;
-      left: 0; right: 0;
-      height: 40%;
-      top: -40%;
-      background: linear-gradient(180deg, transparent 0%, rgba(56,189,248,0.04) 50%, transparent 100%);
-      animation: scan 3s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    @keyframes scan {
-      0%   { top: -40%; }
-      100% { top: 140%; }
-    }
-
-    /* ── TIMELINE slide ── */
+    /* ─── TIMELINE slide ────────────────────────────────── */
     .tl-slide-inner {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 2rem;
-      width: 100%;
+      position: relative; z-index: 1;
+      text-align: center; padding: 2rem; width: 100%;
     }
-
     .tl-slide-inner h3 {
-      font-family: var(--font-head);
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--cyan);
-      margin-bottom: 3rem;
+      font-family: var(--font-head); font-size: 0.7rem;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: 3rem;
     }
-
     .timeline {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 0;
-      max-width: 900px;
-      margin: 0 auto;
+      display: flex; align-items: flex-start; justify-content: center;
+      max-width: 900px; margin: 0 auto;
     }
-
     .tl-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      min-width: 110px;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 0.5rem; min-width: 110px;
     }
-
     .tl-dot {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      background: var(--surface2);
-      border: 1px solid rgba(56,189,248,0.3);
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--surface2); border: 1px solid rgba(56,189,248,0.3);
+      transition: background 0.4s, box-shadow 0.4s;
     }
-
-    .tl-dot.active {
-      background: var(--cyan);
-      box-shadow: 0 0 14px var(--cyan);
-    }
-
-    .tl-year {
-      font-family: var(--font-head);
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--cyan);
-    }
-
-    .tl-label {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      text-align: center;
-      letter-spacing: 0.04em;
-      max-width: 90px;
-    }
-
+    .tl-dot.active { background: var(--cyan); box-shadow: 0 0 14px var(--cyan); }
+    .tl-year { font-family: var(--font-head); font-size: 0.85rem; font-weight: 700; color: var(--cyan); }
+    .tl-label { font-size: 0.65rem; color: var(--text-muted); text-align: center; letter-spacing: 0.04em; max-width: 90px; }
     .tl-line {
-      flex: 1;
-      height: 1px;
+      flex: 1; height: 1px;
       background: linear-gradient(90deg, rgba(56,189,248,0.3), rgba(56,189,248,0.1));
-      min-width: 20px;
-      margin-top: 5px;
+      min-width: 20px; margin-top: 5px;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.5s var(--ease);
     }
+    .slide.active .tl-line { transform: scaleX(1); }
 
-    /* ── CLOSING slide ── */
+    /* ─── CLOSING slide ─────────────────────────────────── */
     .closing-inner {
-      text-align: center;
-      padding: 2rem;
-      position: relative;
-      z-index: 1;
-      max-width: 860px;
+      text-align: center; padding: 2rem;
+      position: relative; z-index: 1; max-width: 860px;
     }
-
     .closing-label {
-      font-family: var(--font-head);
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--cyan);
-      display: block;
-      margin-bottom: 2rem;
+      font-family: var(--font-head); font-size: 0.65rem;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--cyan); display: block; margin-bottom: 2rem;
     }
-
     .closing-inner blockquote {
       font-family: var(--font-head);
       font-size: clamp(1.4rem, 3.2vw, 2.5rem);
-      font-weight: 700;
-      font-style: italic;
-      color: #fff;
-      line-height: 1.35;
-      letter-spacing: -0.01em;
-      margin-bottom: 1.5rem;
+      font-weight: 700; font-style: italic; color: #fff;
+      line-height: 1.35; letter-spacing: -0.01em; margin-bottom: 1.5rem;
     }
-
     .closing-inner blockquote span {
       background: linear-gradient(135deg, var(--cyan), var(--violet));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-
-    .closing-sub {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-    }
-
+    .closing-sub { font-size: 0.95rem; color: var(--text-muted); }
     .closing-rule {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      justify-content: center;
-      margin-top: 2.5rem;
+      display: flex; align-items: center; gap: 1rem;
+      justify-content: center; margin-top: 2.5rem;
     }
-
-    .closing-rule-line {
-      width: 70px; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--cyan));
-    }
+    .closing-rule-line { width: 70px; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan)); }
     .closing-rule-line.r { background: linear-gradient(90deg, var(--cyan), transparent); }
-    .closing-rule-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--cyan);
-      box-shadow: 0 0 8px var(--cyan);
-    }
+    .closing-rule-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
 
-    /* ── Slide-in animation ── */
-    .slide-content {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
-    }
-
-    .slide.active .slide-content {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── Works Cited ── */
+    /* ─── WORKS CITED ───────────────────────────────────── */
     .works-cited-inner {
-      text-align: left;
-      padding: 2rem 3rem;
-      position: relative;
-      z-index: 1;
-      max-width: 860px;
-      width: 100%;
+      text-align: left; padding: 2rem 3rem;
+      position: relative; z-index: 1; max-width: 860px; width: 100%;
     }
-
     .wc-list {
-      list-style: decimal;
-      padding-left: 1.4rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.1rem;
+      list-style: decimal; padding-left: 1.4rem;
+      display: flex; flex-direction: column; gap: 1.1rem;
     }
-
-    .wc-list li {
-      font-family: var(--font-body);
-      font-size: 0.92rem;
-      color: var(--text-sub);
-      line-height: 1.7;
-    }
-
+    .wc-list li { font-family: var(--font-body); font-size: 0.92rem; color: var(--text-sub); line-height: 1.7; }
     .wc-list li em { font-style: italic; color: var(--text); }
-
     .wc-list a {
-      color: var(--cyan);
-      text-decoration: none;
+      color: var(--cyan); text-decoration: none;
       border-bottom: 1px solid rgba(56,189,248,0.25);
       transition: border-color 0.2s, color 0.2s;
     }
+    .wc-list a:hover { color: #fff; border-color: var(--cyan); }
 
-    .wc-list a:hover {
-      color: #fff;
-      border-color: var(--cyan);
-    }
-
-    /* ── Reduced motion ── */
+    /* ─── Reduced motion ────────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
-      .slide-content { opacity: 1 !important; transform: none !important; }
+      .a-up, .a-right, .a-left, .a-scale { opacity: 1 !important; transform: none !important; }
+      .ch-img::before, .ch-img::after { width: 20px !important; height: 20px !important; opacity: 0.5 !important; }
     }
 
-    /* ── Mobile ── */
+    /* ─── Mobile ────────────────────────────────────────── */
     @media (max-width: 768px) {
       .ch-slide-inner, .ch-slide-inner.flip {
-        grid-template-columns: 1fr;
-        direction: ltr;
-        gap: 2rem;
-        padding: 0 1.5rem;
-        overflow-y: auto;
-        align-content: center;
+        grid-template-columns: 1fr; direction: ltr;
+        gap: 2rem; padding: 0 1.5rem; overflow-y: auto; align-content: center;
       }
-
       .ch-img { aspect-ratio: 16/9; }
-
+      .a-right, .a-left { transform: translateY(36px) !important; }
+      .slide.active .a-right, .slide.active .a-left { transform: translateY(0) scale(1) !important; }
       .timeline { flex-wrap: wrap; justify-content: center; gap: 1.5rem; }
       .tl-line { display: none; }
-
       #dots { display: none; }
     }
   </style>
 </head>
 <body>
 
-<!-- Dot navigation -->
 <nav id="dots" aria-label="Section navigation"></nav>
 
-<!-- Scroll container -->
 <div id="scroll-container">
 
   <!-- Slide 0: Hero -->
   <section class="slide grid-bg" data-label="Intro">
-    <div class="glow-blob" style="width:600px;height:400px;top:-100px;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
-    <div class="hero-content slide-content">
-      <h1>The best invention mankind has ever made</h1>
-      <h2>The Greatest Advancement</h2>
+    <div class="glow-blob" style="width:600px;height:400px;top:-80px;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
+    <div class="particles" id="hero-particles"></div>
+    <div class="hero-content">
+      <h1 class="a-up d0">The best invention mankind has ever made</h1>
+      <h2 class="a-up d2">The Greatest Advancement</h2>
     </div>
     <div class="scroll-hint" aria-hidden="true">
       <span>Scroll</span>
@@ -576,41 +441,41 @@
 
   <!-- Slide 1: Timeline -->
   <section class="slide" data-label="Timeline">
-    <div class="glow-blob" style="width:500px;height:300px;bottom:0;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
-    <div class="tl-slide-inner slide-content">
-      <h3>The AI timeline</h3>
+    <div class="glow-blob" style="width:500px;height:300px;bottom:-50px;left:50%;transform:translateX(-50%);background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
+    <div class="tl-slide-inner">
+      <h3 class="a-up d0">The AI Timeline</h3>
       <div class="timeline">
-        <div class="tl-item">
+        <div class="tl-item a-up d1">
           <div class="tl-dot active"></div>
           <span class="tl-year">1956</span>
           <span class="tl-label">AI term coined</span>
         </div>
         <div class="tl-line"></div>
-        <div class="tl-item">
+        <div class="tl-item a-up d2">
           <div class="tl-dot"></div>
           <span class="tl-year">2010s</span>
           <span class="tl-label">Machine Learning</span>
         </div>
         <div class="tl-line"></div>
-        <div class="tl-item">
+        <div class="tl-item a-up d3">
           <div class="tl-dot"></div>
           <span class="tl-year">2022</span>
           <span class="tl-label">ChatGPT launch</span>
         </div>
         <div class="tl-line"></div>
-        <div class="tl-item">
+        <div class="tl-item a-up d4">
           <div class="tl-dot"></div>
           <span class="tl-year">2023</span>
           <span class="tl-label">Agentic AI rises</span>
         </div>
         <div class="tl-line"></div>
-        <div class="tl-item">
+        <div class="tl-item a-up d4">
           <div class="tl-dot active"></div>
           <span class="tl-year">2026</span>
           <span class="tl-label">AI everywhere</span>
         </div>
         <div class="tl-line"></div>
-        <div class="tl-item">
+        <div class="tl-item a-up d5">
           <div class="tl-dot"></div>
           <span class="tl-year">2035</span>
           <span class="tl-label">$140B sector</span>
@@ -621,18 +486,19 @@
 
   <!-- Slide 2: The Spark -->
   <section class="slide" data-label="The Spark">
-    <div class="glow-blob" style="width:400px;height:400px;top:50%;right:-100px;transform:translateY(-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
-    <div class="ch-slide-inner slide-content">
+    <div class="glow-blob" style="width:420px;height:420px;top:50%;right:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
+    <div class="ch-slide-inner">
       <div class="ch-text">
-        <p class="ch-num">01 &mdash; The Spark</p>
-        <h2>Faster Than the Industrial Revolution</h2>
-        <p>Some people think of the <strong>Industrial Revolution</strong> as the most rapid technological advancement in history — attributing the lightbulb, automobiles, and railways to that era's genius. But what if the growth of AI in just the last <strong>four years</strong> was more impactful than the entirety of that revolution?</p>
-        <div class="stat-callout">
+        <p class="ch-num a-up d0">01 &mdash; The Spark</p>
+        <h2 class="a-up d1">Faster Than the Industrial Revolution</h2>
+        <p class="a-up d2">Some people think of the <strong>Industrial Revolution</strong> as the most rapid technological advancement in history — attributing the lightbulb, automobiles, and railways to that era's genius. But what if the growth of AI in just the last <strong>four years</strong> was more impactful than the entirety of that revolution?</p>
+        <div class="stat-callout a-scale d3">
           <span class="num">4 yrs</span>
           <span class="desc">of AI growth that may outpace a century of industrial progress</span>
         </div>
       </div>
-      <div class="ch-img">
+      <div class="ch-img a-right d6">
+        <div class="shimmer"></div>
         <img src="img1.jpg" alt="Industrial Revolution vs AI Revolution comparison" />
       </div>
     </div>
@@ -640,15 +506,16 @@
 
   <!-- Slide 3: The Shift -->
   <section class="slide" data-label="The Shift">
-    <div class="glow-blob" style="width:400px;height:400px;top:50%;left:-100px;transform:translateY(-50%);background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
-    <div class="ch-slide-inner flip slide-content">
+    <div class="glow-blob" style="width:420px;height:420px;top:50%;left:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
+    <div class="ch-slide-inner flip">
       <div class="ch-text">
-        <p class="ch-num">02 &mdash; The Shift</p>
-        <h2>Code Is No Longer Written by Humans</h2>
-        <p>My dad has been a software engineer for over 20 years. Whenever I glanced at his screen, I'd see thousands of lines of code. Last week at his office — <strong>not a single line of code.</strong> Just a Claude Code chat.</p>
-        <p>AI has overturned software and the internet. Five years ago, fewer than 5% of web content was AI-generated. Now in 2026, <strong>over 50% is.</strong></p>
+        <p class="ch-num a-up d0">02 &mdash; The Shift</p>
+        <h2 class="a-up d1">Code Is No Longer Written by Humans</h2>
+        <p class="a-up d2">My dad has been a software engineer for over 20 years. Whenever I glanced at his screen, I'd see thousands of lines of code. Last week at his office — <strong>not a single line of code.</strong> Just a Claude Code chat.</p>
+        <p class="a-up d3">AI has overturned software and the internet. Five years ago, fewer than 5% of web content was AI-generated. Now in 2026, <strong>over 50% is.</strong></p>
       </div>
-      <div class="ch-img">
+      <div class="ch-img a-left d6">
+        <div class="shimmer"></div>
         <img src="img2.webp" alt="Developer coding setup at night" />
       </div>
     </div>
@@ -656,15 +523,16 @@
 
   <!-- Slide 4: The Origin -->
   <section class="slide" data-label="The Origin">
-    <div class="glow-blob" style="width:400px;height:400px;top:50%;right:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#f472b6,transparent)"></div>
-    <div class="ch-slide-inner slide-content">
+    <div class="glow-blob" style="width:420px;height:420px;top:50%;right:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#f472b6,transparent)"></div>
+    <div class="ch-slide-inner">
       <div class="ch-text">
-        <p class="ch-num">03 &mdash; The Origin</p>
-        <h2>From 1956 to Agentic AI</h2>
-        <p>AI was first conceived in <strong>1956 by John McCarthy</strong>, who coined the term "Artificial Intelligence" and imagined a machine that could reason and act on its own. It evolved from rule-based logic to machine learning to the agentic systems we have today.</p>
-        <p>The pace accelerated so fast that <strong>AutoGPT gained over 100,000 GitHub stars in a single day</strong> — one of the fastest-growing open-source projects ever.</p>
+        <p class="ch-num a-up d0">03 &mdash; The Origin</p>
+        <h2 class="a-up d1">From 1956 to Agentic AI</h2>
+        <p class="a-up d2">AI was first conceived in <strong>1956 by John McCarthy</strong>, who coined the term "Artificial Intelligence" and imagined a machine that could reason and act on its own. It evolved from rule-based logic to machine learning to the agentic systems we have today.</p>
+        <p class="a-up d3">The pace accelerated so fast that <strong>AutoGPT gained over 100,000 GitHub stars in a single day</strong> — one of the fastest-growing open-source projects ever.</p>
       </div>
-      <div class="ch-img">
+      <div class="ch-img a-right d6">
+        <div class="shimmer"></div>
         <img src="img3.jpg" alt="John McCarthy, father of Artificial Intelligence" />
       </div>
     </div>
@@ -672,15 +540,16 @@
 
   <!-- Slide 5: My Story -->
   <section class="slide" data-label="My Story">
-    <div class="glow-blob" style="width:400px;height:400px;top:50%;left:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
-    <div class="ch-slide-inner flip slide-content">
+    <div class="glow-blob" style="width:420px;height:420px;top:50%;left:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
+    <div class="ch-slide-inner flip">
       <div class="ch-text">
-        <p class="ch-num">04 &mdash; My Story</p>
-        <h2>The Moment Everything Changed</h2>
-        <p>My first encounter with modern AI was in <strong>2023, in 7th grade ELA</strong>. A friend showed me ChatGPT. I asked it to write an essay on the Declaration of Independence — and was floored by the speed and quality.</p>
-        <p>That feeling kept returning: when Claude Code and Codex made coding a single sentence, when Atlas, Cowork, and Openclaw let AI browse the web for you. People started <strong>buying Mac minis as AI-powered mini employees</strong> — paid a fraction of a human salary but 1,000× more capable.</p>
+        <p class="ch-num a-up d0">04 &mdash; My Story</p>
+        <h2 class="a-up d1">The Moment Everything Changed</h2>
+        <p class="a-up d2">My first encounter with modern AI was in <strong>2023, in 7th grade ELA</strong>. A friend showed me ChatGPT. I asked it to write an essay on the Declaration of Independence — and was floored by the speed and quality.</p>
+        <p class="a-up d3">That feeling kept returning: when Claude Code and Codex made coding a single sentence, when Atlas, Cowork, and Openclaw let AI browse the web for you. People started <strong>buying Mac minis as AI-powered mini employees</strong> — paid a fraction of a human salary but 1,000× more capable.</p>
       </div>
-      <div class="ch-img">
+      <div class="ch-img a-left d6">
+        <div class="shimmer"></div>
         <img src="img4.jpg" alt="ChatGPT interface" />
       </div>
     </div>
@@ -688,20 +557,21 @@
 
   <!-- Slide 6: The Future -->
   <section class="slide" data-label="The Future">
-    <div class="glow-blob" style="width:400px;height:400px;top:50%;right:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
-    <div class="ch-slide-inner slide-content">
+    <div class="glow-blob" style="width:420px;height:420px;top:50%;right:-80px;transform:translateY(-50%);background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
+    <div class="ch-slide-inner">
       <div class="ch-text">
-        <p class="ch-num">05 &mdash; The Future</p>
-        <h2>A $140 Billion World Without Human Workers</h2>
-        <p>The agentic AI sector is valued at <strong>$7 billion today</strong>. In nine years it's projected to surpass <strong>$140 billion</strong>. Imagine companies no longer hiring employees — just paying for AI bots that know everything and do it better than any human ever could.</p>
-        <div class="stat-callout">
+        <p class="ch-num a-up d0">05 &mdash; The Future</p>
+        <h2 class="a-up d1">A $140 Billion World Without Human Workers</h2>
+        <p class="a-up d2">The agentic AI sector is valued at <strong>$7 billion today</strong>. In nine years it's projected to surpass <strong>$140 billion</strong>. Imagine companies no longer hiring employees — just paying for AI bots that know everything and do it better than any human ever could.</p>
+        <div class="stat-callout a-scale d3">
           <span class="num">20×</span>
           <span class="desc">projected growth of the agentic AI sector in under a decade</span>
         </div>
-        <p>Combined with advanced robotics, AI may eventually make all jobs obsolete.</p>
+        <p class="a-up d4">Combined with advanced robotics, AI may eventually make all jobs obsolete.</p>
       </div>
-      <div class="ch-img">
-        <img src="img5.jpg" alt="Stock market growth chart representing AI sector growth" />
+      <div class="ch-img a-right d6">
+        <div class="shimmer"></div>
+        <img src="img5.jpg" alt="Stock market growth chart" />
       </div>
     </div>
   </section>
@@ -709,13 +579,14 @@
   <!-- Slide 7: Closing -->
   <section class="slide" data-label="Conclusion">
     <div class="glow-blob" style="width:600px;height:400px;top:50%;left:50%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,#38bdf8,transparent)"></div>
-    <div class="closing-inner slide-content">
-      <span class="closing-label">Conclusion</span>
-      <blockquote>
+    <div class="particles" id="closing-particles"></div>
+    <div class="closing-inner">
+      <span class="closing-label a-up d0">Conclusion</span>
+      <blockquote class="a-up d1">
         "AI is the greatest technological advancement humanity will ever make — greater than the lightbulb, the automobile, the computer, <span>even the wheel.</span>"
       </blockquote>
-      <p class="closing-sub">Its impact on the future of humanity is incomprehensible, and it might just never stop improving our lives for the rest of human existence.</p>
-      <div class="closing-rule" aria-hidden="true">
+      <p class="closing-sub a-up d2">Its impact on the future of humanity is incomprehensible, and it might just never stop improving our lives for the rest of human existence.</p>
+      <div class="closing-rule a-scale d3" aria-hidden="true">
         <div class="closing-rule-line"></div>
         <div class="closing-rule-dot"></div>
         <div class="closing-rule-line r"></div>
@@ -725,57 +596,76 @@
 
   <!-- Slide 8: Works Cited -->
   <section class="slide" data-label="Works Cited">
-    <div class="works-cited-inner slide-content">
-      <span class="closing-label">Works Cited</span>
+    <div class="glow-blob" style="width:400px;height:300px;bottom:0;right:0;background:radial-gradient(ellipse,#a78bfa,transparent)"></div>
+    <div class="works-cited-inner">
+      <span class="closing-label a-up d0">Works Cited</span>
       <ol class="wc-list">
-        <li>"History of Artificial Intelligence." <em>Wikipedia</em>, Wikimedia Foundation, <a href="https://en.wikipedia.org/wiki/History_of_artificial_intelligence" target="_blank" rel="noopener">en.wikipedia.org/wiki/History_of_artificial_intelligence</a>.</li>
-        <li>"AutoGPT." <em>Wikipedia</em>, Wikimedia Foundation, <a href="https://en.wikipedia.org/wiki/AutoGPT" target="_blank" rel="noopener">en.wikipedia.org/wiki/AutoGPT</a>.</li>
-        <li>"Artificial Intelligence." <em>Wikiquote</em>, Wikimedia Foundation, <a href="https://en.wikiquote.org/wiki/Artificial_intelligence" target="_blank" rel="noopener">en.wikiquote.org/wiki/Artificial_intelligence</a>.</li>
-        <li>"Agentic AI Market Size, Share &amp; Industry Analysis." <em>Fortune Business Insights</em>, <a href="https://www.fortunebusinessinsights.com/agentic-ai-market-107897" target="_blank" rel="noopener">fortunebusinessinsights.com/agentic-ai-market-107897</a>.</li>
-        <li>"Gartner Predicts Agentic AI Will Autonomously Resolve 80% of Common Customer Service Issues." <em>Gartner</em>, 5 Mar. 2025, <a href="https://www.gartner.com/en/newsroom/press-releases/2025-03-05-gartner-predicts-agentic-ai-will-autonomously-resolve-80-percent-of-common-customer-service-issues" target="_blank" rel="noopener">gartner.com/en/newsroom/press-releases/2025-03-05</a>.</li>
+        <li class="a-up d1">"History of Artificial Intelligence." <em>Wikipedia</em>, Wikimedia Foundation, <a href="https://en.wikipedia.org/wiki/History_of_artificial_intelligence" target="_blank" rel="noopener">en.wikipedia.org/wiki/History_of_artificial_intelligence</a>.</li>
+        <li class="a-up d2">"AutoGPT." <em>Wikipedia</em>, Wikimedia Foundation, <a href="https://en.wikipedia.org/wiki/AutoGPT" target="_blank" rel="noopener">en.wikipedia.org/wiki/AutoGPT</a>.</li>
+        <li class="a-up d3">"Artificial Intelligence." <em>Wikiquote</em>, Wikimedia Foundation, <a href="https://en.wikiquote.org/wiki/Artificial_intelligence" target="_blank" rel="noopener">en.wikiquote.org/wiki/Artificial_intelligence</a>.</li>
+        <li class="a-up d4">"Agentic AI Market Size, Share &amp; Industry Analysis." <em>Fortune Business Insights</em>, <a href="https://www.fortunebusinessinsights.com/agentic-ai-market-107897" target="_blank" rel="noopener">fortunebusinessinsights.com/agentic-ai-market-107897</a>.</li>
+        <li class="a-up d5">"Gartner Predicts Agentic AI Will Autonomously Resolve 80% of Common Customer Service Issues." <em>Gartner</em>, 5 Mar. 2025, <a href="https://www.gartner.com/en/newsroom/press-releases/2025-03-05-gartner-predicts-agentic-ai-will-autonomously-resolve-80-percent-of-common-customer-service-issues" target="_blank" rel="noopener">gartner.com/en/newsroom/press-releases/2025-03-05</a>.</li>
       </ol>
     </div>
   </section>
 
-</div><!-- /scroll-container -->
+</div>
 
 <script>
   const container = document.getElementById('scroll-container');
-  const slides = Array.from(document.querySelectorAll('.slide'));
-  const dotsNav = document.getElementById('dots');
+  const slides    = Array.from(document.querySelectorAll('.slide'));
+  const dotsNav   = document.getElementById('dots');
 
-  // Build dots
+  /* ── Dot nav ── */
   slides.forEach((slide, i) => {
     const btn = document.createElement('button');
     btn.className = 'dot';
-    btn.setAttribute('aria-label', slide.dataset.label || ('Section ' + (i + 1)));
-    btn.addEventListener('click', () => {
-      container.scrollTo({ top: slide.offsetTop, behavior: 'smooth' });
-    });
+    btn.setAttribute('aria-label', slide.dataset.label || 'Section ' + (i + 1));
+    btn.addEventListener('click', () => container.scrollTo({ top: slide.offsetTop, behavior: 'smooth' }));
     dotsNav.appendChild(btn);
   });
-
   const dotBtns = Array.from(dotsNav.querySelectorAll('.dot'));
 
+  /* ── Active state ── */
+  let currentIndex = -1;
   function setActive(index) {
+    if (index === currentIndex) return;
+    currentIndex = index;
     slides.forEach((s, i) => s.classList.toggle('active', i === index));
     dotBtns.forEach((d, i) => d.classList.toggle('active', i === index));
   }
 
-  // IntersectionObserver to track which slide is in view
+  /* ── Intersection observer ── */
   const io = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        setActive(slides.indexOf(entry.target));
-      }
-    });
-  }, { root: container, threshold: 0.6 });
-
+    entries.forEach(e => { if (e.isIntersecting) setActive(slides.indexOf(e.target)); });
+  }, { root: container, threshold: 0.55 });
   slides.forEach(s => io.observe(s));
 
-  // Init
+  /* ── Floating particles ── */
+  function spawnParticles(container, count) {
+    if (!container) return;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 2 + 1;
+      p.style.cssText = [
+        `left:${Math.random() * 100}%`,
+        `bottom:${Math.random() * 30}%`,
+        `width:${size}px`,
+        `height:${size}px`,
+        `animation-duration:${6 + Math.random() * 8}s`,
+        `animation-delay:${Math.random() * 6}s`,
+        `opacity:0`,
+        `background:${Math.random() > 0.5 ? '#38bdf8' : '#a78bfa'}`
+      ].join(';');
+      container.appendChild(p);
+    }
+  }
+  spawnParticles(document.getElementById('hero-particles'), 22);
+  spawnParticles(document.getElementById('closing-particles'), 18);
+
+  /* ── Init ── */
   setActive(0);
 </script>
-
 </body>
 </html>
